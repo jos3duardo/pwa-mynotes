@@ -1,0 +1,411 @@
+// Classes de cores do utilitário
+
+// .success {
+//
+// }
+
+// Paleta de cores do Google definida: http://www.google.com/design/spec/style/color.html
+
+
+$ materialize-red : (
+" base " :        # e51c23 ,
+" lighten-5 " :   #fdeaeb ,
+" clarear-4 " :   # f8c1c3 ,
+" clarear-3 " :   # f3989b ,
+" clarear-2 " :   # ee6e73 ,
+" lighten-1 " :   # ea454b ,
+" escurecer-1 " :    # d0181e ,
+" escurecer-2 " :    # b9151b ,
+" escurecer-3 " :    # a21318 ,
+" escurecer-4 " :    # 8b1014 ,
+);
+
+$ vermelho : (
+" base " :        # F44336 ,
+" lighten-5 " :   #FFEBEE ,
+" clarear-4 " :   # FFCDD2 ,
+" clarear-3 " :   # EF9A9A ,
+" clarear-2 " :   # E57373 ,
+" clarear-1 " :   # EF5350 ,
+" escurecer-1 " :    # E53935 ,
+" escurecer-2 " :    # D32F2F ,
+" escurecer-3 " :    # C62828 ,
+" escurecer-4 " :    # B71C1C ,
+" acento-1 " :     # FF8A80 ,
+" acento-2 " :     # FF5252 ,
+" acento-3 " :     # FF1744 ,
+" acento-4 " :     # D50000
+);
+
+$ rosa : (
+" base " :        # e91e63 ,
+" lighten-5 " :   # fce4ec ,
+" clarear-4 " :   # f8bbd0 ,
+" clarear-3 " :   # f48fb1 ,
+" clarear-2 " :   # f06292 ,
+" lighten-1 " :   # ec407a ,
+" escurecer-1 " :    # d81b60 ,
+" escurecer-2 " :    # c2185b ,
+" escurecer-3 " :    # ad1457 ,
+" escurecer-4 " :    # 880e4f ,
+" accent-1 " :     # ff80ab ,
+" acento-2 " :     # ff4081 ,
+" acento-3 " :     # f50057 ,
+" acento-4 " :     # c51162
+);
+
+$ roxo : (
+" base " :        # 9c27b0 ,
+" lighten-5 " :   # f3e5f5 ,
+" clarear-4 " :   # e1bee7 ,
+" clarear-3 " :   # ce93d8 ,
+" clarear-2 " :   # ba68c8 ,
+" lighten-1 " :   # ab47bc ,
+" escurecer-1 " :    # 8e24aa ,
+" escurecer-2 " :    # 7b1fa2 ,
+" escurecer-3 " :    # 6a1b9a ,
+" escurecer-4 " :    # 4a148c ,
+" accent-1 " :     # ea80fc ,
+" accent-2 " :     # e040fb ,
+" acento-3 " :     # d500f9 ,
+" acento-4 " :     # aa00ff
+);
+
+$ roxo profundo : (
+" base " :        # 673ab7 ,
+" lighten-5 " :   # ede7f6 ,
+" clarear-4 " :   # d1c4e9 ,
+" lighten-3 " :   # b39ddb ,
+" clarear-2 " :   # 9575cd ,
+" clarear-1 " :   # 7e57c2 ,
+" escurecer-1 " :    # 5e35b1 ,
+" darken-2 " :    # 512da8 ,
+" escurecer-3 " :    # 4527a0 ,
+" escurecer-4 " :    # 311b92 ,
+" acento-1 " :     # b388ff ,
+" acento-2 " :     # 7c4dff ,
+" acento-3 " :     # 651fff ,
+" acento-4 " :     # 6200ea
+);
+
+$ indigo : (
+" base " :        # 3f51b5 ,
+" clarear-5 " :   # e8eaf6 ,
+" clarear-4 " :   # c5cae9 ,
+" lighten-3 " :   # 9fa8da ,
+" clarear-2 " :   # 7986cb ,
+" clarear-1 " :   # 5c6bc0 ,
+" darken-1 " :    # 3949ab ,
+" escurecer-2 " :    # 303f9f ,
+" escurecer-3 " :    # 283593 ,
+" escurecer-4 " :    # 1a237e ,
+" acento-1 " :     # 8c9eff ,
+" acento-2 " :     # 536dfe ,
+" accent-3 " :     # 3d5afe ,
+" accent-4 " :     # 304ffe
+);
+
+$ azul : (
+" base " :        # 2196F3 ,
+" lighten-5 " :   # E3F2FD ,
+" clarear-4 " :   #BBDEFB ,
+" clarear-3 " :   # 90CAF9 ,
+" clarear-2 " :   # 64B5F6 ,
+" clarear-1 " :   # 42A5F5 ,
+" escurecer-1 " :    # 1E88E5 ,
+" escurecer-2 " :    # 1976D2 ,
+" escurecer-3 " :    # 1565C0 ,
+" darken-4 " :    # 0D47A1 ,
+" acento-1 " :     # 82B1FF ,
+" acento-2 " :     # 448AFF ,
+" acento-3 " :     # 2979FF ,
+" acento-4 " :     # 2962FF
+);
+
+$ azul claro : (
+" base " :        # 03a9f4 ,
+" lighten-5 " :   # e1f5fe ,
+" lighten-4 " :   # b3e5fc ,
+" clarear-3 " :   # 81d4fa ,
+" clarear-2 " :   # 4fc3f7 ,
+" clarear-1 " :   # 29b6f6 ,
+" darken-1 " :    # 039be5 ,
+" escurecer-2 " :    # 0288d1 ,
+" escurecer-3 " :    # 0277bd ,
+" escurecer-4 " :    # 01579b ,
+" acento-1 " :     # 80d8ff ,
+" acento-2 " :     # 40c4ff ,
+" acento-3 " :     # 00b0ff ,
+" acento-4 " :     # 0091ea
+);
+
+$ ciano : (
+" base " :        # 00bcd4 ,
+" lighten-5 " :   # e0f7fa ,
+" clarear-4 " :   # b2ebf2 ,
+" clarear-3 " :   # 80deea ,
+" clarear-2 " :   # 4dd0e1 ,
+" lighten-1 " :   # 26c6da ,
+" darken-1 " :    # 00acc1 ,
+" escurecer-2 " :    # 0097a7 ,
+" escurecer-3 " :    # 00838f ,
+" escurecer-4 " :    # 006064 ,
+" acento-1 " :     # 84ffff ,
+" acento-2 " :     # 18ffff ,
+" acento-3 " :     # 00e5ff ,
+" acento-4 " :     # 00b8d4
+);
+
+$ cerceta : (
+" base " :        # 009688 ,
+" lighten-5 " :   # e0f2f1 ,
+" lighten-4 " :   # b2dfdb ,
+" clarear-3 " :   # 80cbc4 ,
+" lighten-2 " :   # 4db6ac ,
+" clarear-1 " :   # 26a69a ,
+" darken-1 " :    # 00897b ,
+" escurecer-2 " :    # 00796b ,
+" escurecer-3 " :    # 00695c ,
+" darken-4 " :    # 004d40 ,
+" accent-1 " :     # a7ffeb ,
+" acento-2 " :     # 64ffda ,
+" acento-3 " :     # 1de9b6 ,
+" acento-4 " :     # 00bfa5
+);
+
+$ verde : (
+" base " :        # 4CAF50 ,
+" clarear-5 " :   # E8F5E9 ,
+" clarear-4 " :   # C8E6C9 ,
+" clarear-3 " :   # A5D6A7 ,
+" clarear-2 " :   # 81C784 ,
+" clarear-1 " :   # 66BB6A ,
+" escurecer-1 " :    # 43A047 ,
+" escurecer-2 " :    # 388E3C ,
+" escurecer-3 " :    # 2E7D32 ,
+" darken-4 " :    # 1B5E20 ,
+" acento-1 " :     # B9F6CA ,
+" acento-2 " :     # 69F0AE ,
+" acento-3 " :     # 00E676 ,
+" acento-4 " :     # 00C853
+);
+
+$ verde claro : (
+" base " :        # 8bc34a ,
+" lighten-5 " :   # f1f8e9 ,
+" lighten-4 " :   # dcedc8 ,
+" clarear-3 " :   # c5e1a5 ,
+" clarear-2 " :   # aed581 ,
+" clarear-1 " :   # 9ccc65 ,
+" escurecer-1 " :    # 7cb342 ,
+" escurecer-2 " :    # 689f38 ,
+" escurecer-3 " :    # 558b2f ,
+" escurecer-4 " :    # 33691e ,
+" acento-1 " :     # ccff90 ,
+" acento-2 " :     # b2ff59 ,
+" acento-3 " :     # 76ff03 ,
+" acento-4 " :     # 64dd17
+);
+
+$ lime : (
+" base " :        # cddc39 ,
+" lighten-5 " :   # f9fbe7 ,
+" clarear-4 " :   # f0f4c3 ,
+" clarear-3 " :   # e6ee9c ,
+" clarear-2 " :   # dce775 ,
+" clarear-1 " :   # d4e157 ,
+" darken-1 " :    # c0ca33 ,
+" darken-2 " :    # afb42b ,
+" escurecer-3 " :    # 9e9d24 ,
+" escurecer-4 " :    # 827717 ,
+" acento-1 " :     # f4ff81 ,
+" acento-2 " :     # eeff41 ,
+" acento-3 " :     # c6ff00 ,
+" acento-4 " :     # aeea00
+);
+
+$ amarelo : (
+" base " :        # ffeb3b ,
+" lighten-5 " :   # fffde7 ,
+" clarear-4 " :   # fff9c4 ,
+" lighten-3 " :   # fff59d ,
+" clarear-2 " :   # fff176 ,
+" lighten-1 " :   # ffee58 ,
+" darken-1 " :    # fdd835 ,
+" escurecer-2 " :    # fbc02d ,
+" escurecer-3 " :    # f9a825 ,
+" escurecer-4 " :    # f57f17 ,
+" accent-1 " :     # ffff8d ,
+" acento-2 " :     # ffff00 ,
+" acento-3 " :     # ffea00 ,
+" acento-4 " :     # ffd600
+);
+
+$ âmbar : (
+" base " :        # ffc107 ,
+" lighten-5 " :   # fff8e1 ,
+" lighten-4 " :   # ffecb3 ,
+" clarear-3 " :   # ffe082 ,
+" lighten-2 " :   # ffd54f ,
+" lighten-1 " :   # ffca28 ,
+" darken-1 " :    # ffb300 ,
+" darken-2 " :    # ffa000 ,
+" escurecer-3 " :    # ff8f00 ,
+" darken-4 " :    # ff6f00 ,
+" accent-1 " :     # ffe57f ,
+" acento-2 " :     # ffd740 ,
+" acento-3 " :     # ffc400 ,
+" accent-4 " :     # ffab00
+);
+
+$ laranja : (
+" base " :        # ff9800 ,
+" lighten-5 " :   # fff3e0 ,
+" lighten-4 " :   # ffe0b2 ,
+" lighten-3 " :   # ffcc80 ,
+" lighten-2 " :   # ffb74d ,
+" lighten-1 " :   # ffa726 ,
+" escurecer-1 " :    # fb8c00 ,
+" escurecer-2 " :    # f57c00 ,
+" escurecer-3 " :    # ef6c00 ,
+" escurecer-4 " :    # e65100 ,
+" acento-1 " :     # ffd180 ,
+" accent-2 " :     # ffab40 ,
+" acento-3 " :     # ff9100 ,
+" acento-4 " :     # ff6d00
+);
+
+$ laranja intenso : (
+" base " :        # ff5722 ,
+" lighten-5 " :   # fbe9e7 ,
+" lighten-4 " :   #ffccbc ,
+" lighten-3 " :   # ffab91 ,
+" clarear-2 " :   # ff8a65 ,
+" clarear-1 " :   # ff7043 ,
+" escurecer-1 " :    # f4511e ,
+" escurecer-2 " :    # e64a19 ,
+" escurecer-3 " :    # d84315 ,
+" escurecer-4 " :    # bf360c ,
+" acento-1 " :     # ff9e80 ,
+" acento-2 " :     # ff6e40 ,
+" acento-3 " :     # ff3d00 ,
+" acento-4 " :     # dd2c00
+);
+
+$ marrom : (
+" base " :        # 795548 ,
+" clarear-5 " :   # efebe9 ,
+" clarear-4 " :   # d7ccc8 ,
+" clarear-3 " :   # bcaaa4 ,
+" clarear-2 " :   # a1887f ,
+" lighten-1 " :   # 8d6e63 ,
+" escurecer-1 " :    # 6d4c41 ,
+" escurecer-2 " :    # 5d4037 ,
+" escurecer-3 " :    # 4e342e ,
+" darken -4 " :    # 3e2723
+);
+
+$ azul acinzentado : (
+" base " :        # 607d8b ,
+" lighten-5 " :   # eceff1 ,
+" lighten-4 " :   # cfd8dc ,
+" clarear-3 " :   # b0bec5 ,
+" clarear-2 " :   # 90a4ae ,
+" clarear-1 " :   # 78909c ,
+" escurecer-1 " :    # 546e7a ,
+" escurecer-2 " :    # 455a64 ,
+" escurecer-3 " :    # 37474f ,
+" escurecer-4 " :    # 263238
+);
+
+$ cinza : (
+" base " :        # 9e9e9e ,
+" lighten-5 " :   #fafafa ,
+" clarear-4 " :   # f5f5f5 ,
+" clarear-3 " :   #eeeeee ,
+" clarear-2 " :   # e0e0e0 ,
+" lighten-1 " :   #bdbdbd ,
+" escurecer-1 " :    # 757575 ,
+" escurecer-2 " :    # 616161 ,
+" escurecer-3 " :    # 424242 ,
+" escurecer-4 " :    # 212121
+);
+
+$ tons : (
+" preto " :         # 000000 ,
+" branco " :         #FFFFFF ,
+" transparente " :   transparente
+);
+
+$ cores : (
+" materialize-red " : $ materialize-red ,
+" vermelho " : $ vermelho ,
+" rosa " : $ rosa ,
+" roxo " : $ roxo ,
+" roxo profundo " : $ roxo profundo ,
+" índigo " : $ indigo ,
+" azul " : $ azul ,
+" azul claro " : $ azul claro ,
+" ciano " : $ ciano ,
+" cerceta " : $ cerceta ,
+" verde " : $ verde ,
+" verde claro " : $ verde claro ,
+" lime " : $ lime ,
+" amarelo " : $ amarelo ,
+" âmbar " : $ âmbar ,
+" laranja " : $ laranja ,
+" laranja escuro " : $ laranja escuro ,
+" marrom " : $ marrom ,
+" azul acinzentado " : $ azul acinzentado ,
+" cinza " : $ cinza ,
+" máscaras " : $ máscaras
+) ! padrão ;
+
+
+// Classes de cores
+
+@each  $ color_name , $ color  in  $ colors {
+  @each  $ color_type , $ color_value  em  $ color {
+    @if  $ color_type  ==  " de base " {
+    . # { $ color_name } {
+    background-color : $ color_value  ! important ;
+  }
+    . # { $ COLOR_NAME } -text {
+                           color : $ color_value  ! important ;
+                         }
+  }
+  @else if  $ color_name  ! =  " shades " {
+    . # { $ color_name } . # { $ color_type } {
+    background-color : $ color_value  ! important ;
+  }
+    . # { $ color_name } -text.text- # { $ color_type } {
+    color : $ color_value  ! important ;
+  }
+  }
+  }
+}
+
+// Classes de sombra
+@each  $ color , $ color_value  em  $ shades {
+  . # { $ color } {
+  background-color : $ color_value  ! important ;
+}
+  . # { $ color } -text {
+                    color : $ color_value  ! important ;
+                  }
+}
+
+
+// uso: color ("name_of_color", "type_of_color")
+// para evitar repetir o map-get ($ colors, ...)
+
+@função de  cores ( $ color , $ type ) {
+  @se  map-has-key ( $ colors , $ color ) {
+    $ curr_color : map-get ( $ cores , $ cor );
+    @se  map-has-key ( $ curr_color , $ type ) {
+    @return  map-get ( $ curr_color , $ type );
+    }
+  }
+  @warn  " Desconhecido` # { $ color } ` -` # { $ type } `em $ colors. " ;
+@return null;
+}
