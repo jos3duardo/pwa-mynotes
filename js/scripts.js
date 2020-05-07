@@ -91,11 +91,11 @@ document.addEventListener('click', function (e) {
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
-        .register('./service-worker.js')
-        .then(function(reg) {
-            console.log('Service worker Registered');
-        })
-        .catch(function (err) {
-            console.log('erro', err);
-        });
+    .register('./service-worker.js')
+    .then(function(reg) {
+        console.log('Service worker Registered');
+    })
+    .catch(function (err) {
+        console.log('erro', err);
+    });
 }

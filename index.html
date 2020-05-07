@@ -14,16 +14,16 @@
 
     <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
     <script>
-        // Initialize Firebase
-        var config = {
-            apiKey: "AIzaSyBO8N0CfLu1VKLEOwVfRm5rPIOrg8A7788",
-            authDomain: "pwa-notes-ec59a.firebaseapp.com",
-            databaseURL: "https://pwa-notes-ec59a.firebaseio.com",
-            projectId: "pwa-notes-ec59a",
-            storageBucket: "",
-            messagingSenderId: "582721320268"
-        };
-        firebase.initializeApp(config);
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyBO8N0CfLu1VKLEOwVfRm5rPIOrg8A7788",
+        authDomain: "pwa-notes-ec59a.firebaseapp.com",
+        databaseURL: "https://pwa-notes-ec59a.firebaseio.com",
+        projectId: "pwa-notes-ec59a",
+        storageBucket: "",
+        messagingSenderId: "582721320268"
+    };
+    firebase.initializeApp(config);
     </script>
 
     <script src="js/object.observe.polyfill.js"></script>
@@ -38,26 +38,26 @@
 
     <meta name="msapplication-TileImage" content="images/icons/icon-144x144.png">
     <meta name="msapplication-TileColor" content="#607d8b">
-
+    
     <meta name="theme-color" content="#607d8b">
 
 </head>
 <body class="grey lighten-5 blue-grey-text">
-<header id="header" class="container grey lighten-4">
-    <h1>myNotes</h1>
-</header>
+    <header id="header" class="container grey lighten-4">
+        <h1>myNotes</h1>
+    </header>
 
-<div id="content" class="container grey lighten-4">
-    <p>Adicione suas anotações a seguir</p>
+    <div id="content" class="container grey lighten-4">
+        <p>Adicione suas anotações a seguir</p>
 
-    <form id="form-add-note" class="row">
-        <input type="text" placeholder="Anotações..." class="col-2 white">
-        <input type="submit" value="+" class="blue-grey white-text col-1">
-    </form>
+        <form id="form-add-note" class="row">
+            <input type="text" placeholder="Anotações..." class="col-2 white">
+            <input type="submit" value="+" class="blue-grey white-text col-1">
+        </form>
 
-    <ul id="notes">
-        <li>Nota</li>
-    </ul>
-</div>
+        <ul id="notes">
+            <li>Nota</li>
+        </ul>
+    </div>
 </body>
 </html>

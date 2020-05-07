@@ -1,12 +1,12 @@
-let cacheName = 'notes-jos3duardo-v.1.0';
+let cacheName = 'notes-son-v.1.0.0';
 let filesToCache = [
     './',
     'index.html',
-    './css/colors.css',
-    './css/styles.css',
-    './js/array.observe.polyfill.js',
-    './js/object.observe.polyfill.js',
-    './js/scripts.js'
+    'css/colors.css',
+    'css/styles.css',
+    'js/array.observe.polyfill.js',
+    'js/object.observe.polyfill.js',
+    'js/scripts.js'
 ];
 
 self.addEventListener('install', function (e) {

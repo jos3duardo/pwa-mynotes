@@ -25,7 +25,7 @@
  * Function definition of a handler
  * @callback Handler
  * @param {ChangeRecord[]}                changes
- */
+*/
 /**
  * This represents the data relative to an observed object and one of its
  * handlers
@@ -37,7 +37,7 @@
  * @typedef  {Object}                     ObservedData
  * @property {String[]}                   acceptList
  * @property {ObjectData}                 data
- */
+*/
 /**
  * Type definition for a change. Any other property can be added using
  * the notify() or performChange() methods of the notifier.
@@ -65,10 +65,10 @@
 Object.observe || (function(O, A, root, _undefined) {
     "use strict";
 
-    /**
-     * Relates observed objects and their data
-     * @type {Map<Object, ObjectData}
-     */
+        /**
+         * Relates observed objects and their data
+         * @type {Map<Object, ObjectData}
+         */
     var observed,
         /**
          * List of handlers and their data
@@ -80,12 +80,12 @@ Object.observe || (function(O, A, root, _undefined) {
 
     // Functions for internal usage
 
-    /**
-     * Checks if the argument is an Array object. Polyfills Array.isArray.
-     * @function isArray
-     * @param {?*} object
-     * @returns {Boolean}
-     */
+        /**
+         * Checks if the argument is an Array object. Polyfills Array.isArray.
+         * @function isArray
+         * @param {?*} object
+         * @returns {Boolean}
+         */
     var isArray = A.isArray || (function(toString) {
             return function (object) { return toString.call(object) === "[object Array]"; };
         })(O.prototype.toString),
@@ -310,8 +310,8 @@ Object.observe || (function(O, A, root, _undefined) {
                     odesc = data.descriptors[idx];
 
                 if ("value" in descr && (ovalue === value
-                    ? ovalue === 0 && 1/ovalue !== 1/value
-                    : ovalue === ovalue || value === value)) {
+                        ? ovalue === 0 && 1/ovalue !== 1/value
+                        : ovalue === ovalue || value === value)) {
                     addChangeRecord(object, data, {
                         name: key,
                         type: "update",
@@ -321,10 +321,10 @@ Object.observe || (function(O, A, root, _undefined) {
                     data.values[idx] = value;
                 }
                 if (odesc.configurable && (!descr.configurable
-                    || descr.writable !== odesc.writable
-                    || descr.enumerable !== odesc.enumerable
-                    || descr.get !== odesc.get
-                    || descr.set !== odesc.set)) {
+                        || descr.writable !== odesc.writable
+                        || descr.enumerable !== odesc.enumerable
+                        || descr.get !== odesc.get
+                        || descr.set !== odesc.set)) {
                     addChangeRecord(object, data, {
                         name: key,
                         type: "reconfigure",
@@ -339,7 +339,7 @@ Object.observe || (function(O, A, root, _undefined) {
                     ovalue = data.values[idx];
 
                 if (ovalue === value ? ovalue === 0 && 1/ovalue !== 1/value
-                    : ovalue === ovalue || value === value) {
+                        : ovalue === ovalue || value === value) {
                     addChangeRecord(object, data, {
                         name: key,
                         type: "update",
@@ -625,8 +625,8 @@ Object.observe || (function(O, A, root, _undefined) {
                 // called, with except as the type.
                 // All the handlers that accepts that type are skipped.
                 if ((typeof except !== "string"
-                    || inArray(acceptList, except) === -1)
-                    && inArray(acceptList, changeRecord.type) > -1)
+                        || inArray(acceptList, except) === -1)
+                        && inArray(acceptList, changeRecord.type) > -1)
                     hdata.changeRecords.push(changeRecord);
             });
         };
