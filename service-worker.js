@@ -3,7 +3,7 @@ let filesToCache = [
     './',
     'index.html',
     'css/colors.css',
-    'css/styles.css',
+    'css/style.css',
     'js/array.observe.polyfill.js',
     'js/object.observe.polyfill.js',
     'js/scripts.js'
