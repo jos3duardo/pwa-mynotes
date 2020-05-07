@@ -1,741 +1,741 @@
-/ *!
-* Object.observe polyfill - v0.2.4
-* por Massimo Artizzu (MaxArt2501)
-*
-* https://github.com/MaxArt2501/object-observe
-*
-* Licenciado sob a licença MIT
-* Consulte LICENÇA para obter detalhes
-* /
+/*!
+ * Object.observe polyfill - v0.2.4
+ * by Massimo Artizzu (MaxArt2501)
+ *
+ * https://github.com/MaxArt2501/object-observe
+ *
+ * Licensed under the MIT License
+ * See LICENSE for details
+ */
 
-// Algumas definições de tipo
-/ **
-* Isso representa os dados relativos a um objeto observado
-* @typedef {Object} ObjectData
-manipuladores * @property {Map <Handler, HandlerData>}
-* @property {String []} propriedades
-* @valores de propriedade
-* @property {Descritor []} descritores
-* @property {Notificador} notificador
-* @property {Boolean} congelado
-* @property {Boolean} extensível
-* @property {Object} proto
-* /
-/ **
-* Definição de função de um manipulador
-* @callback Handler
-* @param {ChangeRecord []} muda
-* /
-/ **
-* Isso representa os dados relativos a um objeto observado e um de seus
-* manipuladores
-* @typedef {Object} HandlerData
-* @property {Map <Object, ObservedData>} observado
-* @property {ChangeRecord []} changeRecords
-* /
-/ **
-* @typedef {Object} ObservedData
-* @property {String []} acceptList
-* dados @property {ObjectData}
-* /
-/ **
-* Digite a definição para uma alteração. Qualquer outra propriedade pode ser adicionada usando
-* os métodos notify () ou performChange () do notificador.
-* @typedef {Object} ChangeRecord
-* tipo @property {String}
-* @property {Object} objeto
-* @property {String} [nome]
-* @property {*} [oldValue]
-* @property {Number} [index]
-* /
-/ **
-* Definição de tipo para um notificador (o que Object.getNotifier retorna)
-* @typedef {Objeto} Notificador
-* @property {Function} notificar
-* @property {Function} performChange
-* /
-/ **
-* Função chamada com Notifier.performChange. Opcionalmente, pode retornar um
-* ChangeRecord que é notificado automaticamente, mas `type` e` object`
-* as propriedades são substituídas.
-* @callback Performer
-* @returns {ChangeRecord | undefined}
-* /
+// Some type definitions
+/**
+ * This represents the data relative to an observed object
+ * @typedef  {Object}                     ObjectData
+ * @property {Map<Handler, HandlerData>}  handlers
+ * @property {String[]}                   properties
+ * @property {*[]}                        values
+ * @property {Descriptor[]}               descriptors
+ * @property {Notifier}                   notifier
+ * @property {Boolean}                    frozen
+ * @property {Boolean}                    extensible
+ * @property {Object}                     proto
+ */
+/**
+ * Function definition of a handler
+ * @callback Handler
+ * @param {ChangeRecord[]}                changes
+ */
+/**
+ * This represents the data relative to an observed object and one of its
+ * handlers
+ * @typedef  {Object}                     HandlerData
+ * @property {Map<Object, ObservedData>}  observed
+ * @property {ChangeRecord[]}             changeRecords
+ */
+/**
+ * @typedef  {Object}                     ObservedData
+ * @property {String[]}                   acceptList
+ * @property {ObjectData}                 data
+ */
+/**
+ * Type definition for a change. Any other property can be added using
+ * the notify() or performChange() methods of the notifier.
+ * @typedef  {Object}                     ChangeRecord
+ * @property {String}                     type
+ * @property {Object}                     object
+ * @property {String}                     [name]
+ * @property {*}                          [oldValue]
+ * @property {Number}                     [index]
+ */
+/**
+ * Type definition for a notifier (what Object.getNotifier returns)
+ * @typedef  {Object}                     Notifier
+ * @property {Function}                   notify
+ * @property {Function}                   performChange
+ */
+/**
+ * Function called with Notifier.performChange. It may optionally return a
+ * ChangeRecord that gets automatically notified, but `type` and `object`
+ * properties are overridden.
+ * @callback Performer
+ * @returns {ChangeRecord|undefined}
+ */
 
-Object.observe || (função (O, A, raiz, _ não definida) {
+Object.observe || (function(O, A, root, _undefined) {
     "use strict";
 
-    / **
-    * Relaciona objetos observados e seus dados
-    * @type {Map <Object, ObjectData}
-* /
-    var observado,
-        / **
-* Lista de manipuladores e seus dados
-    * @type {Mapa <manipulador, mapa <objeto, manipulador de dados >>}
-* /
-    manipuladores,
+    /**
+     * Relates observed objects and their data
+     * @type {Map<Object, ObjectData}
+     */
+    var observed,
+        /**
+         * List of handlers and their data
+         * @type {Map<Handler, Map<Object, HandlerData>>}
+         */
+        handlers,
 
-        defaultAcceptList = ["add", "update", "delete", "reconfigure", "setPrototype", "preventExtensions"];
+        defaultAcceptList = [ "add", "update", "delete", "reconfigure", "setPrototype", "preventExtensions" ];
 
-    // Funções para uso interno
+    // Functions for internal usage
 
-    / **
-    * Verifica se o argumento é um objeto Array. Polyfills Array.isArray.
-    * @function isArray
-    objeto * @param {? *}
-* @returns {Boolean}
-    * /
-        var isArray = A.isArray || (function (toString) {
-                função de retorno (objeto) {retornar toString.call (objeto) === "[matriz de objeto]"; };
-            }) (O.prototype.toString),
+    /**
+     * Checks if the argument is an Array object. Polyfills Array.isArray.
+     * @function isArray
+     * @param {?*} object
+     * @returns {Boolean}
+     */
+    var isArray = A.isArray || (function(toString) {
+            return function (object) { return toString.call(object) === "[object Array]"; };
+        })(O.prototype.toString),
 
-            / **
-    * Retorna o índice de um item em uma coleção ou -1 se não for encontrado.
-                                                                  * Usa o genérico Array.indexOf ou Array.prototype.indexOf, se disponível.
-        * @função inArray
-        * @param {matriz}
-    * @param {*} gire o item a ser procurado
-        * @param {Number} [start = 0] Índice para começar a partir de
-        * @returns {Number}
-        * /
-            inArray = A.prototype.indexOf? A.indexOf || função (matriz, pivô, início) {
-                return A.prototype.indexOf.call (array, pivot, start);
-            }: função (matriz, pivô, início) {
-                for (var i = start || 0; i <comprimento da matriz; i ++)
-                if (matriz [i] === dinâmica)
-                    retornar i;
-                retorno -1;
-            }
+        /**
+         * Returns the index of an item in a collection, or -1 if not found.
+         * Uses the generic Array.indexOf or Array.prototype.indexOf if available.
+         * @function inArray
+         * @param {Array} array
+         * @param {*} pivot           Item to look for
+         * @param {Number} [start=0]  Index to start from
+         * @returns {Number}
+         */
+        inArray = A.prototype.indexOf ? A.indexOf || function(array, pivot, start) {
+            return A.prototype.indexOf.call(array, pivot, start);
+        } : function(array, pivot, start) {
+            for (var i = start || 0; i < array.length; i++)
+                if (array[i] === pivot)
+                    return i;
+            return -1;
+        },
 
-            / **
-            * Retorna uma instância de Map ou um objeto parecido com Map é Map is not
-            * suportado ou não suporta forEach ()
-            * @function createMap
-            * @returns {Mapa}
-        * /
-            createMap = root.Map === _undefined || ! Map.prototype.forEach? function () {
-                // Calço leve do mapa. Falta limpar (), entradas (), teclas () e
-                // values ​​() (os últimos 3 não são suportados pelo IE11, portanto, não podem ser usados),
-                // não lida com o argumento do construtor (como o IE11) e de
-                // é claro que ele não suporta ... de.
-                // Chrome 31-35 e Firefox 13-24 têm um suporte básico do Map, mas
-                // eles não têm forEach (), então sua implementação nativa é ruim para
-                // este polyfill. (O Chrome 36 ou superior é compatível com Object.observe.)
-                chaves var = [], valores = [];
+        /**
+         * Returns an instance of Map, or a Map-like object is Map is not
+         * supported or doesn't support forEach()
+         * @function createMap
+         * @returns {Map}
+         */
+        createMap = root.Map === _undefined || !Map.prototype.forEach ? function() {
+            // Lightweight shim of Map. Lacks clear(), entries(), keys() and
+            // values() (the last 3 not supported by IE11, so can't use them),
+            // it doesn't handle the constructor's argument (like IE11) and of
+            // course it doesn't support for...of.
+            // Chrome 31-35 and Firefox 13-24 have a basic support of Map, but
+            // they lack forEach(), so their native implementation is bad for
+            // this polyfill. (Chrome 36+ supports Object.observe.)
+            var keys = [], values = [];
 
-                Retorna {
-                    tamanho: 0,
-                        has: function (key) {retorna Array (teclas, tecla)> -1; }
-                    get: function (key) {retorna valores [inArray (keys, key)]; }
-                    set: function (chave, valor) {
-                        var i = inArray (chaves, chave);
-                        if (i === -1) {
-                            keys.push (chave);
-                            values.push (valor);
-                            this.size ++;
-                        } else values ​​[i] = value;
+            return {
+                size: 0,
+                has: function(key) { return inArray(keys, key) > -1; },
+                get: function(key) { return values[inArray(keys, key)]; },
+                set: function(key, value) {
+                    var i = inArray(keys, key);
+                    if (i === -1) {
+                        keys.push(key);
+                        values.push(value);
+                        this.size++;
+                    } else values[i] = value;
+                },
+                "delete": function(key) {
+                    var i = inArray(keys, key);
+                    if (i > -1) {
+                        keys.splice(i, 1);
+                        values.splice(i, 1);
+                        this.size--;
                     }
-                    "delete": função (tecla) {
-                        var i = inArray (chaves, chave);
-                        se (i> -1) {
-                            keys.splice (i, 1);
-                            values.splice (i, 1);
-                            this.size--;
-                        }
-                    }
-                    forEach: function (retorno de chamada / *, thisObj * /) {
-                    for (var i = 0; i <comprimento da chave; i ++)
-                    callback.call (argumentos [1], valores [i], chaves [i], isso);
+                },
+                forEach: function(callback/*, thisObj*/) {
+                    for (var i = 0; i < keys.length; i++)
+                        callback.call(arguments[1], values[i], keys[i], this);
                 }
             };
-}: function () {retorna novo mapa (); }
+        } : function() { return new Map(); },
 
-/ **
-* Calço simples para Object.getOwnPropertyNames quando não está disponível
-* Perde verificações no objeto, não use como uma substituição do Object.keys / getOwnPropertyNames
-* @function getProps
-* @param {Object} objeto
-* @returns {String []}
-* /
-getProps = O.getOwnPropertyNames? (function () {
-    var func = O.getOwnPropertyNames;
-    tentar {
-        argument.callee;
-    } captura (e) {
-        // O modo estrito é suportado
+        /**
+         * Simple shim for Object.getOwnPropertyNames when is not available
+         * Misses checks on object, don't use as a replacement of Object.keys/getOwnPropertyNames
+         * @function getProps
+         * @param {Object} object
+         * @returns {String[]}
+         */
+        getProps = O.getOwnPropertyNames ? (function() {
+            var func = O.getOwnPropertyNames;
+            try {
+                arguments.callee;
+            } catch (e) {
+                // Strict mode is supported
 
-        // No modo estrito, não podemos acessar "argumentos", "chamador" e
-        // propriedades "callee" das funções. Object.getOwnPropertyNames
-        // retorna ["protótipo", "comprimento", "nome"] no Firefox; retorna
-        // "chamador" e "argumentos" também no Chrome e na Internet
-        // Explorer, portanto, esses valores devem ser filtrados.
-        var evitar = (func (inArray) .join ("") + ""). substituir (/ protótipo | comprimento | nome / g, ""). fatia (0, -1). divisão ("");
-        if (Avoid.length) func = function (objeto) {
-            var props = O.getOwnPropertyNames (objeto);
-            if (tipo de objeto === "função")
-            for (var i = 0, j; i <comprimento; evitar;)
-            if ((j = inArray (props, evite [i ++]))> -1)
-                props.splice (j, 1);
+                // In strict mode, we can't access to "arguments", "caller" and
+                // "callee" properties of functions. Object.getOwnPropertyNames
+                // returns [ "prototype", "length", "name" ] in Firefox; it returns
+                // "caller" and "arguments" too in Chrome and in Internet
+                // Explorer, so those values must be filtered.
+                var avoid = (func(inArray).join(" ") + " ").replace(/prototype |length |name /g, "").slice(0, -1).split(" ");
+                if (avoid.length) func = function(object) {
+                    var props = O.getOwnPropertyNames(object);
+                    if (typeof object === "function")
+                        for (var i = 0, j; i < avoid.length;)
+                            if ((j = inArray(props, avoid[i++])) > -1)
+                                props.splice(j, 1);
 
-            adereços de retorno;
-        };
-    }
-    return func;
-}) (): função (objeto) {
-    // Versão de boca em boca com for ... in (IE8-)
-    var props = [], prop, hop;
-    if ("hasOwnProperty" no objeto) {
-        for (prop no objeto)
-        if (object.hasOwnProperty (prop))
-            props.push (prop);
-    } outro {
-        hop = O.hasOwnProperty;
-        for (prop no objeto)
-        if (hop.call (objeto, prop))
-            props.push (prop);
-    }
-
-    // Inserindo uma propriedade não enumerável comum de matrizes
-    if (isArray (objeto))
-        props.push ("comprimento");
-
-    adereços de retorno;
-}
-
-/ **
-* Retorne o protótipo do objeto ... se definido.
-* @function getPrototype
-* @param {Object} objeto
-* @returns {Object}
-* /
-getPrototype = O.getPrototypeOf,
-
-/ **
-* Retorne o descritor do objeto ... se definido.
-* O IE8 suporta um Object.getOwnPropertyDescriptor (DOM) inútil para DOM
-* somente nós, portanto defineProperties é verificado.
-* @function getDescriptor
-* @param {Object} objeto
-Propriedade @param {String}
-* @returns {Descritor}
-* /
-getDescriptor = O.defineProperties && O.getOwnPropertyDescriptor,
-
-/ **
-* Configura a próxima verificação e entrega da iteração, usando
-* requestAnimationFrame ou um polyfill (fechado).
-* @função nextFrame
-* @param {function} func
-* @returns {number}
-* /
-nextFrame = root.requestAnimationFrame || root.webkitRequestAnimationFrame || (function () {
-    var inicial = + nova data,
-        last = inicial;
-    função de retorno (func) {
-        retornar setTimeout (function () {
-            func ((last = + new Date) - inicial);
-            17);
-    };
-}) (),
-
-/ **
-* Configura a observação de um objeto
-* @function doObserve
-* @param {Object} objeto
-manipulador * @param {Handler}
-* @param {String []} [acceptList]
-* /
-doObserve = function (objeto, manipulador, acceptList) {
-    var data = observado.get (objeto);
-
-    if (dados) {
-        performPropertyChecks (dados, objeto);
-        setHandler (objeto, dados, manipulador, acceptList);
-    } outro {
-        data = createObjectData (objeto);
-        setHandler (objeto, dados, manipulador, acceptList);
-
-        if (tamanho.s observado === 1)
-        // Que comece a observação!
-        nextFrame (runGlobalLoop);
-    }
-}
-
-/ **
-* Cria os dados iniciais para um objeto observado
-* @function createObjectData
-* @param {Object} objeto
-* /
-createObjectData = função (objeto, dados) {
-    var props = getProps (objeto),
-        valores = [], descs, i = 0,
-        data = {
-            manipuladores: createMap (),
-            frozen: O.isFrozen? O.isFrozen (objeto): false,
-            extensível: O. é extensível? O.isExtensible (objeto): true,
-            proto: getPrototype && getPrototype (objeto),
-            propriedades: adereços,
-            valores: valores,
-            notifier: retrieveNotifier (objeto, dados)
-        };
-
-    if (getDescriptor) {
-        descs = data.descriptors = [];
-        while (i <props.length) {
-            descs [i] = getDescriptor (objeto, adereços [i]);
-            valores [i] = objeto [props [i ++]];
-        }
-    } else while (i <props.length)
-        valores [i] = objeto [props [i ++]];
-
-    observado.set (objeto, dados);
-
-    retornar dados;
-}
-
-/ **
-* Executa verificações básicas de alteração do valor da propriedade em um objeto observado
-* @function performPropertyChecks
-* dados @param {ObjectData}
-* @param {Object} objeto
-* @param {String} [exceto] Não entrega as alterações no diretório
-* manipuladores que aceitam esse tipo
-* /
-performPropertyChecks = (function () {
-    var updateCheck = getDescriptor? função (objeto, dados, idx, exceto descr) {
-        chave var = data.properties [idx],
-            valor = objeto [chave],
-            ovalue = data.values ​​[idx],
-            odesc = data.descriptors [idx];
-
-        if ("value" em descr && (ovalue === value
-            ? ovalue === 0 && 1 / ovalue! == 1 / valor
-    : ovalue === ovalue || valor === valor)) {
-            addChangeRecord (objeto, dados, {
-                nome: chave,
-                tipo: "atualização",
-                objeto: objeto,
-                oldValue: ovalue
-            }, exceto);
-            data.values ​​[idx] = valor;
-        }
-        if (odesc.configurable && (! descr.configurable
-            || descr.writable! == odesc.writable
-        || descr.enumerable! == odesc.enumerable
-        || descr.get! == odesc.get
-        || descr.set! == odesc.set)) {
-            addChangeRecord (objeto, dados, {
-                nome: chave,
-                tipo: "reconfigurar",
-                objeto: objeto,
-                oldValue: ovalue
-            }, exceto);
-            data.descriptors [idx] = descr;
-        }
-    }: função (objeto, dados, idx, exceto) {
-        chave var = data.properties [idx],
-            valor = objeto [chave],
-            ovalue = dados.valores [idx];
-
-        if (ovalue === valor? ovalue === 0 && 1 / ovalue! == 1 / valor
-            : ovalue === ovalue || valor === valor) {
-            addChangeRecord (objeto, dados, {
-                nome: chave,
-                tipo: "atualização",
-                objeto: objeto,
-                oldValue: ovalue
-            }, exceto);
-            data.values ​​[idx] = valor;
-        }
-    };
-
-    // Verifica se alguma propriedade foi excluída
-    var deletionCheck = getDescriptor? função (objeto, adereços, proplen, dados, exceto) {
-        var i = props.length, descr;
-        while (proplen && i--) {
-        if (props [i]! == null) {
-            descr = getDescriptor (objeto, adereços [i]);
-            proplen--;
-
-            // Se não houver descritor, a propriedade realmente
-            // foi excluído; caso contrário, foi reconfigurado para
-            // isso não é mais enumerável
-            if (descr) updateCheck (objeto, dados, i, exceto descr);
-            outro {
-                addChangeRecord (objeto, dados, {
-                    nome: adereços [i],
-                    tipo: "excluir",
-                    objeto: objeto,
-                    oldValue: data.values ​​[i]
-            }, exceto);
-                data.properties.splice (i, 1);
-                data.values.splice (i, 1);
-                data.descriptors.splice (i, 1);
+                    return props;
+                };
             }
-        }
-    }
-}: função (objeto, adereços, proplen, dados, exceto) {
-        var i = props.length;
-        while (proplen && i--)
-            if (props [i]! == null) {
-            addChangeRecord (objeto, dados, {
-                nome: adereços [i],
-                tipo: "excluir",
-                objeto: objeto,
-                oldValue: data.values ​​[i]
-        }, exceto);
-            data.properties.splice (i, 1);
-            data.values.splice (i, 1);
-            proplen--;
-        }
-    };
+            return func;
+        })() : function(object) {
+            // Poor-mouth version with for...in (IE8-)
+            var props = [], prop, hop;
+            if ("hasOwnProperty" in object) {
+                for (prop in object)
+                    if (object.hasOwnProperty(prop))
+                        props.push(prop);
+            } else {
+                hop = O.hasOwnProperty;
+                for (prop in object)
+                    if (hop.call(object, prop))
+                        props.push(prop);
+            }
 
-    função de retorno (dados, objeto, exceto) {
-        if (! data.handlers.size || data.frozen) return;
+            // Inserting a common non-enumerable property of arrays
+            if (isArray(object))
+                props.push("length");
 
-        var adereços, proplen, chaves,
-            valores = dados.valores,
-            descs = data.descriptors,
-            i = 0, idx,
-            valor chave,
-            proto, descr;
+            return props;
+        },
 
-        // Se o objeto não for extensível, não precisamos verificar se há novos
-        // ou propriedades excluídas
-        if (data.extensible) {
+        /**
+         * Return the prototype of the object... if defined.
+         * @function getPrototype
+         * @param {Object} object
+         * @returns {Object}
+         */
+        getPrototype = O.getPrototypeOf,
 
-            props = data.properties.slice ();
-            proplen = props.length;
-            chaves = getProps (objeto);
+        /**
+         * Return the descriptor of the object... if defined.
+         * IE8 supports a (useless) Object.getOwnPropertyDescriptor for DOM
+         * nodes only, so defineProperties is checked instead.
+         * @function getDescriptor
+         * @param {Object} object
+         * @param {String} property
+         * @returns {Descriptor}
+         */
+        getDescriptor = O.defineProperties && O.getOwnPropertyDescriptor,
 
-            if (descs) {
-                while (i <comprimento da chave) {
-                    chave = chaves [i ++];
-                    idx = inArray (adereços, chave);
-                    descr = getDescriptor (objeto, chave);
+        /**
+         * Sets up the next check and delivering iteration, using
+         * requestAnimationFrame or a (close) polyfill.
+         * @function nextFrame
+         * @param {function} func
+         * @returns {number}
+         */
+        nextFrame = root.requestAnimationFrame || root.webkitRequestAnimationFrame || (function() {
+            var initial = +new Date,
+                last = initial;
+            return function(func) {
+                return setTimeout(function() {
+                    func((last = +new Date) - initial);
+                }, 17);
+            };
+        })(),
 
-                    if (idx === -1) {
-                        addChangeRecord (objeto, dados, {
-                            nome: chave,
-                            tipo: "adicionar",
-                            objeto: objeto
-                        }, exceto);
-                        data.properties.push (chave);
-                        values.push (objeto [chave]);
-                        descs.push (descr);
-                    } outro {
-                        props [idx] = nulo;
+        /**
+         * Sets up the observation of an object
+         * @function doObserve
+         * @param {Object} object
+         * @param {Handler} handler
+         * @param {String[]} [acceptList]
+         */
+        doObserve = function(object, handler, acceptList) {
+            var data = observed.get(object);
+
+            if (data) {
+                performPropertyChecks(data, object);
+                setHandler(object, data, handler, acceptList);
+            } else {
+                data = createObjectData(object);
+                setHandler(object, data, handler, acceptList);
+
+                if (observed.size === 1)
+                    // Let the observation begin!
+                    nextFrame(runGlobalLoop);
+            }
+        },
+
+        /**
+         * Creates the initial data for an observed object
+         * @function createObjectData
+         * @param {Object} object
+         */
+        createObjectData = function(object, data) {
+            var props = getProps(object),
+                values = [], descs, i = 0,
+                data = {
+                    handlers: createMap(),
+                    frozen: O.isFrozen ? O.isFrozen(object) : false,
+                    extensible: O.isExtensible ? O.isExtensible(object) : true,
+                    proto: getPrototype && getPrototype(object),
+                    properties: props,
+                    values: values,
+                    notifier: retrieveNotifier(object, data)
+                };
+
+            if (getDescriptor) {
+                descs = data.descriptors = [];
+                while (i < props.length) {
+                    descs[i] = getDescriptor(object, props[i]);
+                    values[i] = object[props[i++]];
+                }
+            } else while (i < props.length)
+                values[i] = object[props[i++]];
+
+            observed.set(object, data);
+
+            return data;
+        },
+
+        /**
+         * Performs basic property value change checks on an observed object
+         * @function performPropertyChecks
+         * @param {ObjectData} data
+         * @param {Object} object
+         * @param {String} [except]  Doesn't deliver the changes to the
+         *                           handlers that accept this type
+         */
+        performPropertyChecks = (function() {
+            var updateCheck = getDescriptor ? function(object, data, idx, except, descr) {
+                var key = data.properties[idx],
+                    value = object[key],
+                    ovalue = data.values[idx],
+                    odesc = data.descriptors[idx];
+
+                if ("value" in descr && (ovalue === value
+                    ? ovalue === 0 && 1/ovalue !== 1/value
+                    : ovalue === ovalue || value === value)) {
+                    addChangeRecord(object, data, {
+                        name: key,
+                        type: "update",
+                        object: object,
+                        oldValue: ovalue
+                    }, except);
+                    data.values[idx] = value;
+                }
+                if (odesc.configurable && (!descr.configurable
+                    || descr.writable !== odesc.writable
+                    || descr.enumerable !== odesc.enumerable
+                    || descr.get !== odesc.get
+                    || descr.set !== odesc.set)) {
+                    addChangeRecord(object, data, {
+                        name: key,
+                        type: "reconfigure",
+                        object: object,
+                        oldValue: ovalue
+                    }, except);
+                    data.descriptors[idx] = descr;
+                }
+            } : function(object, data, idx, except) {
+                var key = data.properties[idx],
+                    value = object[key],
+                    ovalue = data.values[idx];
+
+                if (ovalue === value ? ovalue === 0 && 1/ovalue !== 1/value
+                    : ovalue === ovalue || value === value) {
+                    addChangeRecord(object, data, {
+                        name: key,
+                        type: "update",
+                        object: object,
+                        oldValue: ovalue
+                    }, except);
+                    data.values[idx] = value;
+                }
+            };
+
+            // Checks if some property has been deleted
+            var deletionCheck = getDescriptor ? function(object, props, proplen, data, except) {
+                var i = props.length, descr;
+                while (proplen && i--) {
+                    if (props[i] !== null) {
+                        descr = getDescriptor(object, props[i]);
                         proplen--;
-                        updateCheck (objeto, dados, idx, exceto descr);
+
+                        // If there's no descriptor, the property has really
+                        // been deleted; otherwise, it's been reconfigured so
+                        // that's not enumerable anymore
+                        if (descr) updateCheck(object, data, i, except, descr);
+                        else {
+                            addChangeRecord(object, data, {
+                                name: props[i],
+                                type: "delete",
+                                object: object,
+                                oldValue: data.values[i]
+                            }, except);
+                            data.properties.splice(i, 1);
+                            data.values.splice(i, 1);
+                            data.descriptors.splice(i, 1);
+                        }
                     }
                 }
-                deletionCheck (objeto, adereços, proplen, dados, exceto);
-
-                if (! O.isExtensible (object)) {
-                    data.extensible = false;
-                    addChangeRecord (objeto, dados, {
-                        tipo: "preventExtensions",
-                        objeto: objeto
-                    }, exceto);
-
-                    data.frozen = O.isFrozen (objeto);
-                }
-            } outro {
-                while (i <comprimento da chave) {
-                    chave = chaves [i ++];
-                    idx = inArray (adereços, chave);
-                    valor = objeto [chave];
-
-                    if (idx === -1) {
-                        addChangeRecord (objeto, dados, {
-                            nome: chave,
-                            tipo: "adicionar",
-                            objeto: objeto
-                        }, exceto);
-                        data.properties.push (chave);
-                        values.push (valor);
-                    } outro {
-                        props [idx] = nulo;
+            } : function(object, props, proplen, data, except) {
+                var i = props.length;
+                while (proplen && i--)
+                    if (props[i] !== null) {
+                        addChangeRecord(object, data, {
+                            name: props[i],
+                            type: "delete",
+                            object: object,
+                            oldValue: data.values[i]
+                        }, except);
+                        data.properties.splice(i, 1);
+                        data.values.splice(i, 1);
                         proplen--;
-                        updateCheck (objeto, dados, idx, exceto);
+                    }
+            };
+
+            return function(data, object, except) {
+                if (!data.handlers.size || data.frozen) return;
+
+                var props, proplen, keys,
+                    values = data.values,
+                    descs = data.descriptors,
+                    i = 0, idx,
+                    key, value,
+                    proto, descr;
+
+                // If the object isn't extensible, we don't need to check for new
+                // or deleted properties
+                if (data.extensible) {
+
+                    props = data.properties.slice();
+                    proplen = props.length;
+                    keys = getProps(object);
+
+                    if (descs) {
+                        while (i < keys.length) {
+                            key = keys[i++];
+                            idx = inArray(props, key);
+                            descr = getDescriptor(object, key);
+
+                            if (idx === -1) {
+                                addChangeRecord(object, data, {
+                                    name: key,
+                                    type: "add",
+                                    object: object
+                                }, except);
+                                data.properties.push(key);
+                                values.push(object[key]);
+                                descs.push(descr);
+                            } else {
+                                props[idx] = null;
+                                proplen--;
+                                updateCheck(object, data, idx, except, descr);
+                            }
+                        }
+                        deletionCheck(object, props, proplen, data, except);
+
+                        if (!O.isExtensible(object)) {
+                            data.extensible = false;
+                            addChangeRecord(object, data, {
+                                type: "preventExtensions",
+                                object: object
+                            }, except);
+
+                            data.frozen = O.isFrozen(object);
+                        }
+                    } else {
+                        while (i < keys.length) {
+                            key = keys[i++];
+                            idx = inArray(props, key);
+                            value = object[key];
+
+                            if (idx === -1) {
+                                addChangeRecord(object, data, {
+                                    name: key,
+                                    type: "add",
+                                    object: object
+                                }, except);
+                                data.properties.push(key);
+                                values.push(value);
+                            } else {
+                                props[idx] = null;
+                                proplen--;
+                                updateCheck(object, data, idx, except);
+                            }
+                        }
+                        deletionCheck(object, props, proplen, data, except);
+                    }
+
+                } else if (!data.frozen) {
+
+                    // If the object is not extensible, but not frozen, we just have
+                    // to check for value changes
+                    for (; i < props.length; i++) {
+                        key = props[i];
+                        updateCheck(object, data, i, except, getDescriptor(object, key));
+                    }
+
+                    if (O.isFrozen(object))
+                        data.frozen = true;
+                }
+
+                if (getPrototype) {
+                    proto = getPrototype(object);
+                    if (proto !== data.proto) {
+                        addChangeRecord(object, data, {
+                            type: "setPrototype",
+                            name: "__proto__",
+                            object: object,
+                            oldValue: data.proto
+                        });
+                        data.proto = proto;
                     }
                 }
-                deletionCheck (objeto, adereços, proplen, dados, exceto);
+            };
+        })(),
+
+        /**
+         * Sets up the main loop for object observation and change notification
+         * It stops if no object is observed.
+         * @function runGlobalLoop
+         */
+        runGlobalLoop = function() {
+            if (observed.size) {
+                observed.forEach(performPropertyChecks);
+                handlers.forEach(deliverHandlerRecords);
+                nextFrame(runGlobalLoop);
             }
+        },
 
-        } senão se (! data.frozen) {
-
-            // Se o objeto não é extensível, mas não congelado, apenas temos
-            // para verificar alterações de valor
-            for (; i <props.length; i ++) {
-                chave = adereços [i];
-                updateCheck (objeto, dados, i, exceto getDescriptor (objeto, chave));
+        /**
+         * Deliver the change records relative to a certain handler, and resets
+         * the record list.
+         * @param {HandlerData} hdata
+         * @param {Handler} handler
+         */
+        deliverHandlerRecords = function(hdata, handler) {
+            var records = hdata.changeRecords;
+            if (records.length) {
+                hdata.changeRecords = [];
+                handler(records);
             }
+        },
 
-            if (O.isFrozen (objeto))
-                data.frozen = true;
-        }
+        /**
+         * Returns the notifier for an object - whether it's observed or not
+         * @function retrieveNotifier
+         * @param {Object} object
+         * @param {ObjectData} [data]
+         * @returns {Notifier}
+         */
+        retrieveNotifier = function(object, data) {
+            if (arguments.length < 2)
+                data = observed.get(object);
 
-        if (getPrototype) {
-            proto = getPrototype (objeto);
-            if (proto! == data.proto) {
-                addChangeRecord (objeto, dados, {
-                    tipo: "setPrototype",
-                    nome: "__proto__",
-                    objeto: objeto,
-                    oldValue: data.proto
+            /** @type {Notifier} */
+            return data && data.notifier || {
+                /**
+                 * @method notify
+                 * @see http://arv.github.io/ecmascript-object-observe/#notifierprototype._notify
+                 * @memberof Notifier
+                 * @param {ChangeRecord} changeRecord
+                 */
+                notify: function(changeRecord) {
+                    changeRecord.type; // Just to check the property is there...
+
+                    // If there's no data, the object has been unobserved
+                    var data = observed.get(object);
+                    if (data) {
+                        var recordCopy = { object: object }, prop;
+                        for (prop in changeRecord)
+                            if (prop !== "object")
+                                recordCopy[prop] = changeRecord[prop];
+                        addChangeRecord(object, data, recordCopy);
+                    }
+                },
+
+                /**
+                 * @method performChange
+                 * @see http://arv.github.io/ecmascript-object-observe/#notifierprototype_.performchange
+                 * @memberof Notifier
+                 * @param {String} changeType
+                 * @param {Performer} func     The task performer
+                 * @param {*} [thisObj]        Used to set `this` when calling func
+                 */
+                performChange: function(changeType, func/*, thisObj*/) {
+                    if (typeof changeType !== "string")
+                        throw new TypeError("Invalid non-string changeType");
+
+                    if (typeof func !== "function")
+                        throw new TypeError("Cannot perform non-function");
+
+                    // If there's no data, the object has been unobserved
+                    var data = observed.get(object),
+                        prop, changeRecord,
+                        thisObj = arguments[2],
+                        result = thisObj === _undefined ? func() : func.call(thisObj);
+
+                    data && performPropertyChecks(data, object, changeType);
+
+                    // If there's no data, the object has been unobserved
+                    if (data && result && typeof result === "object") {
+                        changeRecord = { object: object, type: changeType };
+                        for (prop in result)
+                            if (prop !== "object" && prop !== "type")
+                                changeRecord[prop] = result[prop];
+                        addChangeRecord(object, data, changeRecord);
+                    }
+                }
+            };
+        },
+
+        /**
+         * Register (or redefines) an handler in the collection for a given
+         * object and a given type accept list.
+         * @function setHandler
+         * @param {Object} object
+         * @param {ObjectData} data
+         * @param {Handler} handler
+         * @param {String[]} acceptList
+         */
+        setHandler = function(object, data, handler, acceptList) {
+            var hdata = handlers.get(handler);
+            if (!hdata)
+                handlers.set(handler, hdata = {
+                    observed: createMap(),
+                    changeRecords: []
                 });
-                data.proto = proto;
-            }
+            hdata.observed.set(object, {
+                acceptList: acceptList.slice(),
+                data: data
+            });
+            data.handlers.set(handler, hdata);
+        },
+
+        /**
+         * Adds a change record in a given ObjectData
+         * @function addChangeRecord
+         * @param {Object} object
+         * @param {ObjectData} data
+         * @param {ChangeRecord} changeRecord
+         * @param {String} [except]
+         */
+        addChangeRecord = function(object, data, changeRecord, except) {
+            data.handlers.forEach(function(hdata) {
+                var acceptList = hdata.observed.get(object).acceptList;
+                // If except is defined, Notifier.performChange has been
+                // called, with except as the type.
+                // All the handlers that accepts that type are skipped.
+                if ((typeof except !== "string"
+                    || inArray(acceptList, except) === -1)
+                    && inArray(acceptList, changeRecord.type) > -1)
+                    hdata.changeRecords.push(changeRecord);
+            });
+        };
+
+    observed = createMap();
+    handlers = createMap();
+
+    /**
+     * @function Object.observe
+     * @see http://arv.github.io/ecmascript-object-observe/#Object.observe
+     * @param {Object} object
+     * @param {Handler} handler
+     * @param {String[]} [acceptList]
+     * @throws {TypeError}
+     * @returns {Object}               The observed object
+     */
+    O.observe = function observe(object, handler, acceptList) {
+        if (!object || typeof object !== "object" && typeof object !== "function")
+            throw new TypeError("Object.observe cannot observe non-object");
+
+        if (typeof handler !== "function")
+            throw new TypeError("Object.observe cannot deliver to non-function");
+
+        if (O.isFrozen && O.isFrozen(handler))
+            throw new TypeError("Object.observe cannot deliver to a frozen function object");
+
+        if (acceptList === _undefined)
+            acceptList = defaultAcceptList;
+        else if (!acceptList || typeof acceptList !== "object")
+            throw new TypeError("Third argument to Object.observe must be an array of strings.");
+
+        doObserve(object, handler, acceptList);
+
+        return object;
+    };
+
+    /**
+     * @function Object.unobserve
+     * @see http://arv.github.io/ecmascript-object-observe/#Object.unobserve
+     * @param {Object} object
+     * @param {Handler} handler
+     * @throws {TypeError}
+     * @returns {Object}         The given object
+     */
+    O.unobserve = function unobserve(object, handler) {
+        if (object === null || typeof object !== "object" && typeof object !== "function")
+            throw new TypeError("Object.unobserve cannot unobserve non-object");
+
+        if (typeof handler !== "function")
+            throw new TypeError("Object.unobserve cannot deliver to non-function");
+
+        var hdata = handlers.get(handler), odata;
+
+        if (hdata && (odata = hdata.observed.get(object))) {
+            hdata.observed.forEach(function(odata, object) {
+                performPropertyChecks(odata.data, object);
+            });
+            nextFrame(function() {
+                deliverHandlerRecords(hdata, handler);
+            });
+
+            // In Firefox 13-18, size is a function, but createMap should fall
+            // back to the shim for those versions
+            if (hdata.observed.size === 1 && hdata.observed.has(object))
+                handlers["delete"](handler);
+            else hdata.observed["delete"](object);
+
+            if (odata.data.handlers.size === 1)
+                observed["delete"](object);
+            else odata.data.handlers["delete"](handler);
+        }
+
+        return object;
+    };
+
+    /**
+     * @function Object.getNotifier
+     * @see http://arv.github.io/ecmascript-object-observe/#GetNotifier
+     * @param {Object} object
+     * @throws {TypeError}
+     * @returns {Notifier}
+     */
+    O.getNotifier = function getNotifier(object) {
+        if (object === null || typeof object !== "object" && typeof object !== "function")
+            throw new TypeError("Object.getNotifier cannot getNotifier non-object");
+
+        if (O.isFrozen && O.isFrozen(object)) return null;
+
+        return retrieveNotifier(object);
+    };
+
+    /**
+     * @function Object.deliverChangeRecords
+     * @see http://arv.github.io/ecmascript-object-observe/#Object.deliverChangeRecords
+     * @see http://arv.github.io/ecmascript-object-observe/#DeliverChangeRecords
+     * @param {Handler} handler
+     * @throws {TypeError}
+     */
+    O.deliverChangeRecords = function deliverChangeRecords(handler) {
+        if (typeof handler !== "function")
+            throw new TypeError("Object.deliverChangeRecords cannot deliver to non-function");
+
+        var hdata = handlers.get(handler);
+        if (hdata) {
+            hdata.observed.forEach(function(odata, object) {
+                performPropertyChecks(odata.data, object);
+            });
+            deliverHandlerRecords(hdata, handler);
         }
     };
-}) (),
 
-/ **
-* Configura o loop principal para observação de objetos e notificação de alterações
-* Para se nenhum objeto for observado.
-                            * @function runGlobalLoop
-                            * /
-                            runGlobalLoop = function () {
-    if (tamanho.s observado) {
-        observado.paraCada (performPropertyChecks);
-        handlers.forEach (deliverHandlerRecords);
-        nextFrame (runGlobalLoop);
-    }
-}
-
-    / **
-    * Entregue os registros de alterações relativos a um determinado manipulador e redefina
-* a lista de registros.
-* @param {HandlerData} hdata
-manipulador * @param {Handler}
-* /
-deliverHandlerRecords = function (hdata, manipulador) {
-    registros var = hdata.changeRecords;
-    if (records.length) {
-        hdata.changeRecords = [];
-        manipulador (registros);
-    }
-}
-
-/ **
-* Retorna o notificador para um objeto - observado ou não
-* @function retrieveNotifier
-* @param {Object} objeto
-* @param {ObjectData} [dados]
-* @returns {Notificador}
-* /
-retrieveNotifier = função (objeto, dados) {
-    if (argument.length <2)
-        data = observado.get (objeto);
-
-    / ** @type {Notificador} * /
-    retornar dados && data.notifier || {
-    / **
-    * @method notify
-    * @see http://arv.github.io/ecmascript-object-observe/#notifierprototype._notify
-        * @memberof Notifier
-    * @param {ChangeRecord} changeRecord
-    * /
-    notify: function (changeRecord) {
-        changeRecord.type; // Apenas para verificar se a propriedade existe ...
-
-        // Se não houver dados, o objeto não foi observado
-        var data = observado.get (objeto);
-        if (dados) {
-            var recordCopy = {objeto: objeto}, prop;
-            for (prop em changeRecord)
-            if (prop! == "objeto")
-            recordCopy [prop] = changeRecord [prop];
-            addChangeRecord (objeto, dados, recordCopy);
-        }
-    }
-
-    / **
-    * @method performChange
-    * @see http://arv.github.io/ecmascript-object-observe/#notifierprototype_.performchange
-        * @memberof Notifier
-    * @param {String} changeType
-    * @param {Executor} func O executador de tarefas
-    * @param {*} [thisObj] Usado para definir `this` ao chamar func
-    * /
-    performChange: function (changeType, func / *, thisObj * /) {
-    if (typeof changeType! == "string")
-    lançar novo TypeError ("changeType não-string inválido");
-
-    if (typeof func! == "function")
-    lança novo TypeError ("Não é possível executar a não função");
-
-    // Se não houver dados, o objeto não foi observado
-    var data = observado.get (objeto),
-        prop, changeRecord,
-        thisObj = argumentos [2],
-        resultado = thisObj === _ não definido? func (): func.call (thisObj);
-
-    data && performPropertyChecks (dados, objeto, changeType);
-
-    // Se não houver dados, o objeto não foi observado
-    if (data && result && typeof result === "objeto") {
-        changeRecord = {objeto: objeto, digite: changeType};
-        for (prop no resultado)
-        if (prop! == "objeto" && prop! == "tipo")
-        changeRecord [prop] = resultado [prop];
-        addChangeRecord (objeto, dados, changeRecord);
-    }
-}
-};
-}
-
-/ **
-* Registre (ou redefina) um manipulador na coleção para um determinado
-* objeto e um determinado tipo aceita lista.
-* @function setHandler
-* @param {Object} objeto
-* dados @param {ObjectData}
-manipulador * @param {Handler}
-* @param {String []} acceptList
-* /
-setHandler = função (objeto, dados, manipulador, acceptList) {
-    var hdata = manipuladores.get (manipulador);
-    if (! hdata)
-        handlers.set (manipulador, hdata = {
-            observado: createMap (),
-            changeRecords: []
-        });
-    hdata.observed.set (objeto, {
-        acceptList: acceptList.slice (),
-        data: data
-    });
-    data.handlers.set (manipulador, hdata);
-}
-
-/ **
-* Adiciona um registro de alteração em um determinado ObjectData
-* @function addChangeRecord
-* @param {Object} objeto
-* dados @param {ObjectData}
-* @param {ChangeRecord} changeRecord
-* @param {String} [exceto]
-* /
-addChangeRecord = função (objeto, dados, changeRecord, exceto) {
-    data.handlers.forEach (function (hdata) {
-        var acceptList = hdata.observed.get (objeto) .acceptList;
-        // Se except for definido, Notifier.performChange foi
-        // chamado, com exceto como o tipo.
-        // Todos os manipuladores que aceitam esse tipo são ignorados.
-        if ((typeof exceto! == "string"
-        || inArray (acceptList, exceto) === -1)
-    && inArray (acceptList, changeRecord.type)> -1)
-        hdata.changeRecords.push (changeRecord);
-    });
-};
-
-observado = createMap ();
-manipuladores = createMap ();
-
-/ **
-* @function Object.observe
-* @see http://arv.github.io/ecmascript-object-observe/#Object.observe
-    * @param {Object} objeto
-manipulador * @param {Handler}
-* @param {String []} [acceptList]
-* @throws {TypeError}
-* @returns {Object} O objeto observado
-* /
-O.observe = função observe (objeto, manipulador, acceptList) {
-    if (! objeto || tipo de objeto! == "objeto" && tipo de objeto! == "função")
-    throw new TypeError ("Object.observe não pode observar não-objeto");
-
-    if (tipo de manipulador! == "function")
-    throw new TypeError ("Object.observe não pode ser entregue para não funcionar");
-
-    if (O.isFrozen && O.isFrozen (manipulador))
-        throw new TypeError ("Object.observe não pode entregar em um objeto de função congelada");
-
-    if (acceptList === _undefined)
-        acceptList = defaultAcceptList;
-    Caso contrário, if (! acceptList || typeof acceptList! == "object")
-    throw new TypeError ("O terceiro argumento para Object.observe deve ser uma matriz de cadeias de caracteres.");
-
-    doObserve (objeto, manipulador, acceptList);
-
-    retornar objeto;
-};
-
-/ **
-* @function Object.unobserve
-* @see http://arv.github.io/ecmascript-object-observe/#Object.unobserve
-    * @param {Object} objeto
-manipulador * @param {Handler}
-* @throws {TypeError}
-* @returns {Object} O objeto fornecido
-* /
-O.unobserve = função não observada (objeto, manipulador) {
-    if (objeto === null || tipo de objeto! == "objeto" && tipo de objeto! == "função")
-    throw new TypeError ("Object.unobserve não pode desobservar não-objeto");
-
-    if (tipo de manipulador! == "function")
-    throw new TypeError ("Object.unobserve não pode ser entregue para não funcionar");
-
-    var hdata = manipuladores.get (manipulador), odata;
-
-    if (hdata && (odata = hdata.observed.get (objeto))) {
-        hdata.observed.forEach (função (odata, objeto) {
-            performPropertyChecks (odata.data, objeto);
-        });
-        nextFrame (function () {
-            deliverHandlerRecords (hdata, manipulador);
-        });
-
-        // No Firefox 13-18, tamanho é uma função, mas createMap deve cair
-        // de volta ao calço para essas versões
-        if (hdata.observed.size === 1 && hdata.observed.has (objeto))
-            manipuladores ["delete"] (manipulador);
-        mais hdata.observed ["delete"] (objeto);
-
-        if (odata.data.handlers.size === 1)
-            observado ["delete"] (objeto);
-        else odata.data.handlers ["delete"] (manipulador);
-    }
-
-    retornar objeto;
-};
-
-/ **
-* @function Object.getNotifier
-* @see http://arv.github.io/ecmascript-object-observe/#GetNotifier
-    * @param {Object} objeto
-* @throws {TypeError}
-* @returns {Notificador}
-* /
-O.getNotifier = função getNotifier (objeto) {
-    if (objeto === null || tipo de objeto! == "objeto" && tipo de objeto! == "função")
-    throw new TypeError ("Object.getNotifier não pode getNotifier não-objeto");
-
-    if (O.isFrozen && O.isFrozen (objeto)) retorna nulo;
-
-    retornar retrieveNotifier (objeto);
-};
-
-/ **
-* @function Object.deliverChangeRecords
-* @see http://arv.github.io/ecmascript-object-observe/#Object.deliverChangeRecords
-    * @see http://arv.github.io/ecmascript-object-observe/#DeliverChangeRecords
-manipulador * @param {Handler}
-* @throws {TypeError}
-* /
-O.deliverChangeRecords = função deliverChangeRecords (manipulador) {
-    if (tipo de manipulador! == "function")
-    throw new TypeError ("Object.deliverChangeRecords não pode ser entregue para não funcionar");
-
-    var hdata = manipuladores.get (manipulador);
-    if (hdata) {
-        hdata.observed.forEach (função (odata, objeto) {
-            performPropertyChecks (odata.data, objeto);
-        });
-        deliverHandlerRecords (hdata, manipulador);
-    }
-};
-
-}) (Object, Array, this);
+})(Object, Array, this);
