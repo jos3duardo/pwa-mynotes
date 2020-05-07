@@ -1,20 +1,63 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <base href="/">
+    <base href="/pwa/">
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/colors.css">
-    <script src="js/scripts.js"></script>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>PWA</title>
+
+    <link rel="stylesheet" href="css/colors.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <link rel="manifest" href="manifest.json">
+
+    <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBO8N0CfLu1VKLEOwVfRm5rPIOrg8A7788",
+            authDomain: "pwa-notes-ec59a.firebaseapp.com",
+            databaseURL: "https://pwa-notes-ec59a.firebaseio.com",
+            projectId: "pwa-notes-ec59a",
+            storageBucket: "",
+            messagingSenderId: "582721320268"
+        };
+        firebase.initializeApp(config);
+    </script>
+
+    <script src="js/object.observe.polyfill.js"></script>
+    <script src="js/array.observe.polyfill.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/push.js"></script>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="myNotes">
+    <link rel="apple-touch-icon" href="images/icons/icon-152x152.png">
+
+    <meta name="msapplication-TileImage" content="images/icons/icon-144x144.png">
+    <meta name="msapplication-TileColor" content="#607d8b">
+
+    <meta name="theme-color" content="#607d8b">
+
 </head>
-<body>
-    <header id="header" class="container">
-        <h1>myNotes</h1>
-    </header>
-    <div class="container"></div>
+<body class="grey lighten-5 blue-grey-text">
+<header id="header" class="container grey lighten-4">
+    <h1>myNotes</h1>
+</header>
+
+<div id="content" class="container grey lighten-4">
+    <p>Adicione suas anotações a seguir</p>
+
+    <form id="form-add-note" class="row">
+        <input type="text" placeholder="Anotações..." class="col-2 white">
+        <input type="submit" value="+" class="blue-grey white-text col-1">
+    </form>
+
+    <ul id="notes">
+        <li>Nota</li>
+    </ul>
+</div>
 </body>
 </html>
