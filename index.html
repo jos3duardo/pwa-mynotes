@@ -12,18 +12,29 @@
 
     <link rel="manifest" href="manifest.json">
 
-    <script src="https://www.gstatic.com/firebasejs/4.3.1/firebase.js"></script>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-analytics.js"></script>
+
+
     <script>
-    // Initialize Firebase
-    var config = {
-        apiKey: "AIzaSyBO8N0CfLu1VKLEOwVfRm5rPIOrg8A7788",
-        authDomain: "pwa-notes-ec59a.firebaseapp.com",
-        databaseURL: "https://pwa-notes-ec59a.firebaseio.com",
-        projectId: "pwa-notes-ec59a",
-        storageBucket: "",
-        messagingSenderId: "582721320268"
-    };
-    firebase.initializeApp(config);
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDnXz2wHsYB721ODCyHXzAFwxe8hyJtbaw",
+            authDomain: "pwa-notes-499b3.firebaseapp.com",
+            databaseURL: "https://pwa-notes-499b3.firebaseio.com",
+            projectId: "pwa-notes-499b3",
+            storageBucket: "pwa-notes-499b3.appspot.com",
+            messagingSenderId: "596694545257",
+            appId: "1:596694545257:web:485ea6a691c1ac731a43f8",
+            measurementId: "G-E2EWPVGFR3"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
     </script>
 
     <script src="js/object.observe.polyfill.js"></script>
