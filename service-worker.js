@@ -1,4 +1,4 @@
-let cacheName = 'notes-son-v.1.0.0';
+let cacheName = 'notes-jos3dardo-v.1.0.0';
 let filesToCache = [
     './',
     'index.html',
